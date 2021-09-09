@@ -137,7 +137,7 @@ void OnTimer(int value)
 void display(void)
 {
 	mat4 vm2;
-	
+
 	// This function is called whenever it is time to render
 	//  a new frame; due to the idle()-function below, this
 	//  function will get called several times per second
@@ -173,27 +173,28 @@ void display(void)
 	// Done rendering the FBO! Set up for rendering on screen, using the result as texture!
 
 //	glFlush(); // Can cause flickering on some systems. Can also be necessary to make drawing complete.
-//	useFBO(0L, fbo1, 0L);
-//	glClearColor(0.0, 0.0, 0.0, 0);
-//	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//
-//	glUseProgram(plaintextureshader);
-//
-//	glDisable(GL_CULL_FACE);
-//	glDisable(GL_DEPTH_TEST);
-//	DrawModel(squareModel, plaintextureshader, "in_Position", NULL, "in_TexCoord");
+	/*useFBO(0L, fbo1, 0L);
+	glClearColor(0.0, 0.0, 0.0, 0);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glUseProgram(plaintextureshader);
+
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	DrawModel(squareModel, plaintextureshader, "in_Position", NULL, "in_TexCoord");*/
 
 // Activate second shader program
-    runfilter(trunkshader, fbo1, 0L, fbo2);
-    for (int i = 0; i < 30; ++i) {
-        if (i % 2 == 0) {
-            runfilter(LPshader, fbo2, 0L, fbo3);
-        } else {
-            runfilter(LPshader, fbo3, 0L, fbo2);
-        }
-    }
-    runfilter(mergeshader, fbo2, fbo1, fbo3);
-    runfilter(plaintextureshader, fbo1, 0L, 0L);
+  runfilter(trunkshader, fbo1, 0L, fbo2);
+	//runfilter(LPshader, fbo2, 0L, 0L);
+  for (int i = 0; i < 30; ++i) {
+      if (i % 2 == 0) {
+          runfilter(LPshader, fbo2, 0L, fbo3);
+      } else {
+          runfilter(LPshader, fbo3, 0L, fbo2);
+      }
+  }
+  runfilter(mergeshader, fbo2, fbo1, fbo3);
+  runfilter(plaintextureshader, fbo3, 0L, 0L);
 
 	glutSwapBuffers();
 }
@@ -231,9 +232,9 @@ void mouseDragged(int x, int y)
 {
 	vec3 p;
 	mat4 m;
-	
+
 	// This is a simple and IMHO really nice trackball system:
-	
+
 	// Use the movement direction to create an orthogonal rotation axis
 
 	p.y = x - prevx;
@@ -243,12 +244,12 @@ void mouseDragged(int x, int y)
 	// Create a rotation around this axis and premultiply it on the model-to-world matrix
 	// Limited to fixed camera! Will be wrong if the camera is moved!
 
-	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0); // Rotation in view coordinates	
+	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0); // Rotation in view coordinates
 	modelToWorldMatrix = Mult(m, modelToWorldMatrix);
-	
+
 	prevx = x;
 	prevy = y;
-	
+
 	glutPostRedisplay();
 }
 
@@ -273,4 +274,3 @@ int main(int argc, char *argv[])
 	glutMainLoop();
 	exit(0);
 }
-
