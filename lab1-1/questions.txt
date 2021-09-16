@@ -1,0 +1,3 @@
+1. De ökar i storlek och blir tydligare att urskilja.
+2. Allokerar tom textur genom att sätta data=NULL
+3. 30
