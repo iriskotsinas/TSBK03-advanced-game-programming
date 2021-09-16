@@ -66,7 +66,7 @@ vec3 g_normalsRes[kMaxRow][kMaxCorners];
 // vertex attributes sent to OpenGL
 vec3 g_boneWeights[kMaxRow][kMaxCorners];
 
-float weight[kMaxRow] = {0.0, 0.0, 0.0, 0.0, 0.2, 0.8, 1.0, 1.0, 1.0, 1.0};
+float weight[kMaxRow] = {0.0, 0.0, 0.1, 0.3, 0.2, 0.8, 0.7, 0.9, 1.0, 1.0};
 //float weight[kMaxRow] = {0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
 Model *cylinderModel; // Collects all the above for drawing with glDrawElements
@@ -243,7 +243,7 @@ void DeformCylinder()
             //vec3 contribution2 = MultVec3(M2, vm);
 						vec3 v1 = ScalarMult(MultVec3(M1, vm), 1 - weight[row]);
 						vec3 v2 = ScalarMult(MultVec3(M2, vm), weight[row]);
-						g_vertsRes[row][corner] = VectorAdd(v1, v2);
+						// g_vertsRes[row][corner] = VectorAdd(v1, v2);
             //g_vertsRes[row][corner] = VectorAdd(contribution1, contribution2);
 
           	// if (weight[row]) {
@@ -265,9 +265,9 @@ void DeformCylinder()
 			// g_vertsOrg inneh�ller ursprunglig vertexdata.
 			// g_vertsRes inneh�ller den vertexdata som skickas till OpenGL.
 						//
-            // vec3 vm1 = ScalarMult(MultVec3(M1, vm), g_boneWeights[row][corner].x);
-            // vec3 vm2 = ScalarMult(MultVec3(M2, vm), g_boneWeights[row][corner].y);
-            // g_vertsRes[row][corner] = VectorAdd(vm1, vm2);
+            vec3 vm1 = ScalarMult(MultVec3(M1, vm), g_boneWeights[row][corner].x);
+            vec3 vm2 = ScalarMult(MultVec3(M2, vm), g_boneWeights[row][corner].y);
+            g_vertsRes[row][corner] = VectorAdd(vm1, vm2);
 		}
 	}
 }
@@ -327,10 +327,10 @@ void DrawCylinder()
 	// Ers�tt DeformCylinder med en vertex shader som g�r vad DeformCylinder g�r.
 	// Begynnelsen till shaderkoden ligger i filen "shader.vert" ...
 
-	DeformCylinder();
+	//DeformCylinder();
 
-	//setBoneLocation();
-	//setBoneRotation();
+	setBoneLocation();
+	setBoneRotation();
 
 // update cylinder vertices:
 	glBindVertexArray(cylinderModel->vao);
@@ -410,7 +410,7 @@ int main(int argc, char **argv)
 #endif
 	BuildCylinder();
 	setupBones();
-	g_shader = loadShaders("shader2.vert" , "shader.frag");
+	g_shader = loadShaders("shader.vert" , "shader.frag");
 
 	glutMainLoop();
 	exit(0);
