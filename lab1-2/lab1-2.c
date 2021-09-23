@@ -84,7 +84,7 @@ GLfloat Vs[24][3] = {
 							{-1.0,0.0,0.0},
 							{-1.0,0.0,0.0},
 							{-1.0,0.0,0.0},
-							
+
 							};
 GLfloat Vt[24][3] = {
 							// 3-4
@@ -117,7 +117,7 @@ GLfloat Vt[24][3] = {
 							{0.0,1.0,0.0},
 							{0.0,1.0,0.0},
 							{0.0,1.0,0.0},
-							
+
 							};
 
 //----------------------Globals-------------------------------------------------
@@ -157,7 +157,7 @@ void init(void)
 	vec3 up = {0, 1, 0};
 	viewMatrix = lookAtv(cam, point, up);
 	modelToWorldMatrix = IdentityMatrix();
-	
+
 	// Upload Vs and Vt arrays to VBOs
 	glBindVertexArray(cube->vao);
 	glGenBuffers(1, &vsBuffer);
@@ -228,9 +228,9 @@ void mouseDragged(int x, int y)
 {
 	vec3 p;
 	mat4 m;
-	
+
 	// This is a simple and IMHO really nice trackball system:
-	
+
 	// Use the movement direction to create an orthogonal rotation axis
 
 	p.y = x - prevx;
@@ -240,12 +240,12 @@ void mouseDragged(int x, int y)
 	// Create a rotation around this axis and premultiply it on the model-to-world matrix
 	// Limited to fixed camera! Will be wrong if the camera is moved!
 
-	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0); // Rotation in view coordinates	
+	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0); // Rotation in view coordinates
 	modelToWorldMatrix = Mult(m, modelToWorldMatrix);
-	
+
 	prevx = x;
 	prevy = y;
-	
+
 	glutPostRedisplay();
 }
 
@@ -270,4 +270,3 @@ int main(int argc, char *argv[])
     glutMainLoop();
     exit(0);
 }
-
