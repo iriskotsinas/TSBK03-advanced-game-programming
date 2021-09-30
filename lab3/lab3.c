@@ -1,6 +1,6 @@
 // Laboration i spelfysik: Biljardbordet
-// Av Ingemar Ragnemalm 2010, baserad pŒ material av Tomas Szabo.
-// 2012: Ported to OpenGL 3.2 by Justina Mickonyt‘ and Ingemar R.
+// Av Ingemar Ragnemalm 2010, baserad pï¿½ material av Tomas Szabo.
+// 2012: Ported to OpenGL 3.2 by Justina Mickonytï¿½ and Ingemar R.
 // 2013: Adapted to VectorUtils3 and MicroGlut.
 
 // Variant without zpr
@@ -181,8 +181,8 @@ void updateWorld()
     float v_rel;
     vec3 n;
     float impulse;
-    float elastic = 0.9;
-    
+    float elastic = 0.5;
+
 	for (i = 0; i < kNumBalls; i++)
         for (j = i + 1; j < kNumBalls; j++)
         {
@@ -195,10 +195,10 @@ void updateWorld()
             {
                 v_rel = DotProduct(Normalize(n), VectorSub(ball[i].v, ball[j].v));
                 impulse = -(1.0 + elastic) * v_rel/((1.0/ball[i].mass) + (1.0/ball[j].mass));
-                
+
+								// Change to F
                 ball[i].P = VectorAdd(ScalarMult(Normalize(n), impulse), ball[i].P);
                 ball[j].P = VectorAdd(ScalarMult(Normalize(n), -impulse), ball[j].P);
-                
             }
         }
 
@@ -213,6 +213,17 @@ void updateWorld()
         vec3 perp = CrossProduct(yaxis, ball[i].P);
         float angle = sqrt(pow(ball[i].v.x, 2.0) + pow(ball[i].v.y, 2.0) + pow(ball[i].v.z, 2.0)) * 0.1;
         ball[i].R = Mult(ArbRotate(perp, -angle), ball[i].R);
+
+				// friction
+				// if (Norm(ball[i].v) != 0.0) {
+				// 	vec3 rotVel = CrossProduct(ball[i].omega, yaxis);
+				// 	vec3 groundVel = VectorAdd(ball[i].v, rotVel);
+				// 	float Ff = ball[i].mass * (-9.82) * 0.5;
+				// 	vec3 friction = ScalarMult(groundVel, Ff);
+				//
+				// 	ball[i].T = VectorAdd(ball[i].T, CrossProduct(yaxis, friction));
+				// 	ball[i].F = VectorAdd(ball[i].F, friction);
+				// }
 	}
 
 // Update state, follows the book closely
@@ -223,6 +234,8 @@ void updateWorld()
 
 		// Note: omega is not set. How do you calculate it?
 		// YOUR CODE HERE
+		float Jinv = 1.0 / (0.3 * ball[i].mass * pow(kBallSize, 2.0));
+		ball[i].omega = ScalarMult(ball[i].L, Jinv);
 
 //		v := P * 1/mass
 		ball[i].v = ScalarMult(ball[i].P, 1.0/(ball[i].mass));
@@ -329,6 +342,7 @@ void init()
 		ball[i].P = SetVector(((float)(i % 13))/ 50.0, 0.0, ((float)(i % 15))/50.0);
 		ball[i].R = IdentityMatrix();
 	}
+	ball[0].mass = 4.0;
 	ball[0].X = SetVector(0, 0, 0);
 	ball[1].X = SetVector(0, 0, 0.5);
 	ball[2].X = SetVector(0.0, 0, 1.0);
@@ -368,8 +382,8 @@ void display(void)
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewMatrix"), 1, GL_TRUE, viewMatrix.m);
 
     glUniformMatrix4fv(glGetUniformLocation(shader, "modelToWorldMatrix"), 1, GL_TRUE, modelToWorldMatrix.m);
-    
-    
+
+
 
     printError("uploading to shader");
 
@@ -401,9 +415,9 @@ void mouseDragged(int x, int y)
 {
 	vec3 p;
 	mat4 m;
-	
+
 	// This is a simple and IMHO really nice trackball system:
-	
+
 	// Use the movement direction to create an orthogonal rotation axis
 
 	p.y = x - prevx;
@@ -413,12 +427,12 @@ void mouseDragged(int x, int y)
 	// Create a rotation around this axis and premultiply it on the model-to-world matrix
 	// Limited to fixed camera! Will be wrong if the camera is moved!
 
-	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0); // Rotation in view coordinates	
+	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0); // Rotation in view coordinates
 	modelToWorldMatrix = Mult(m, modelToWorldMatrix);
-	
+
 	prevx = x;
 	prevy = y;
-	
+
 	glutPostRedisplay();
 }
 
@@ -451,7 +465,7 @@ int main(int argc, char **argv)
 	glutCreateWindow ("Biljardbordet");
 	glutDisplayFunc(display);
 	glutReshapeFunc(reshape);
-	
+
 	glutMouseFunc(mouseUpDown);
 	glutMotionFunc(mouseDragged);
 
